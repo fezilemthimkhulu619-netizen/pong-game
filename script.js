@@ -1,13 +1,13 @@
 // Create JS representation from the DOM
-const startText = document.getElementById('startText');
-const paddle1 = document.getElementById('paddle1');
-const paddle2 = document.getElementById('paddle2');
-const ball = document.getElementById('ball');
-const player1ScoreElement = document.getElementById('player1Score');
-const player2ScoreElement = document.getElementById('player2Score');
-const lossSound = document.getElementById('lossSound');
-const wallSound = document.getElementById('wallSound');
-const paddleSound = document.getElementById('paddleSound');
+const startText = document.getElementById("startText");
+const paddle1 = document.getElementById("paddle1");
+const paddle2 = document.getElementById("paddle2");
+const ball = document.getElementById("ball");
+const player1ScoreElement = document.getElementById("player1Score");
+const player2ScoreElement = document.getElementById("player2Score");
+const lossSound = document.getElementById("lossSound");
+const wallSound = document.getElementById("wallSound");
+const paddleSound = document.getElementById("paddleSound");
 
 // Game Variables
 let gameRunning = false;
@@ -30,15 +30,15 @@ const paddleDeceleration = 1;
 const gameHeight = 400;
 const gameWidth = 600;
 
-document.addEventListener('keydown', startGame);
-document.addEventListener('keydown', handleKeyDown);
-document.addEventListener('keyup', handleKeyUp);
+document.addEventListener("keydown", startGame);
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("keyup", handleKeyUp);
 
 // Start game
 function startGame() {
   gameRunning = true;
-  startText.style.display = 'none';
-  document.removeEventListener('keydown', startGame);
+  startText.style.display = "none";
+  document.removeEventListener("keydown", startGame);
   gameLoop();
 }
 
@@ -60,9 +60,9 @@ function handleKeyUp(e) {
 }
 
 function updatePaddle1() {
-  if (keysPressed['w']) {
+  if (keysPressed["w"]) {
     paddle1Speed = Math.max(paddle1Speed - paddleAcceleration, -maxPaddleSpeed);
-  } else if (keysPressed['s']) {
+  } else if (keysPressed["s"]) {
     paddle1Speed = Math.min(paddle1Speed + paddleAcceleration, maxPaddleSpeed);
   } else {
     if (paddle1Speed > 0) {
@@ -81,13 +81,13 @@ function updatePaddle1() {
   if (paddle1Y > gameHeight - paddle1.clientHeight) {
     paddle1Y = gameHeight - paddle1.clientHeight;
   }
-  paddle1.style.top = paddle1Y + 'px';
+  paddle1.style.top = paddle1Y + "px";
 }
 
 function updatePaddle2() {
-  if (keysPressed['ArrowUp']) {
+  if (keysPressed["ArrowUp"]) {
     paddle2Speed = Math.max(paddle2Speed - paddleAcceleration, -maxPaddleSpeed);
-  } else if (keysPressed['ArrowDown']) {
+  } else if (keysPressed["ArrowDown"]) {
     paddle2Speed = Math.min(paddle2Speed + paddleAcceleration, maxPaddleSpeed);
   } else {
     if (paddle2Speed > 0) {
@@ -119,27 +119,30 @@ function moveBall() {
     playSound(wallSound);
   }
 
-  // paddle 1 collision
+  // Paddle 1 collision (left)
   if (
     ballX <= paddle1.clientWidth &&
-    ballY >= paddle1Y &&
+    ballX + ball.clientWidth >= 0 &&
+    ballY + ball.clientHeight >= paddle1Y &&
     ballY <= paddle1Y + paddle1.clientHeight
   ) {
+    ballX = paddle1.clientWidth; // Prevent sticking
     ballSpeedX = -ballSpeedX;
     playSound(paddleSound);
   }
 
-  // paddle 2 collision
+  // Paddle 2 collision (right)
   if (
-    ballX >= gameWidth - paddle2.clientWidth - ball.clientWidth &&
-    ballY >= paddle2Y &&
+    ballX + ball.clientWidth >= gameWidth - paddle2.clientWidth &&
+    ballY + ball.clientHeight >= paddle2Y &&
     ballY <= paddle2Y + paddle2.clientHeight
   ) {
+    ballX = gameWidth - paddle2.clientWidth - ball.clientWidth; // Prevent sticking
     ballSpeedX = -ballSpeedX;
     playSound(paddleSound);
   }
 
-  // Out of gameArea collision
+  // Out of bounds (score)
   if (ballX <= 0) {
     player2Score++;
     playSound(lossSound);
@@ -153,9 +156,12 @@ function moveBall() {
     resetBall();
     pauseGame();
   }
-  ball.style.left = ballX + 'px';
-  ball.style.top = ballY + 'px';
+
+  // Update ball position
+  ball.style.left = ballX + "px";
+  ball.style.top = ballY + "px";
 }
+
 
 function updateScoreboard() {
   player1ScoreElement.textContent = player1Score;
@@ -171,7 +177,7 @@ function resetBall() {
 
 function pauseGame() {
   gameRunning = false;
-  document.addEventListener('keydown', startGame);
+  document.addEventListener("keydown", startGame);
 }
 
 function playSound(sound) {
